@@ -17,15 +17,15 @@ which will contain the **backend** module and the **frontend** module.
 
 Assuming that you created the **backend** and **frontend** projects in the 
 specified modules.
- * **backend** - will contain the backend project
- * **frontend** - will contain the frontend project
+ * **services** - will contain the backend project
+ * **ui** - will contain the frontend project
 
 Then, we need to create the modules using Maven Build Tool. We add the modules in the main **pom.xml**
 
 ```
 <modules>
-   <module>backend</module>
-   <module>frontend</module>
+   <module>services</module>
+   <module>ui</module>
 </modules>
 ```
 Also here we have to specify, the packaging to serve as a container for our sub-modules
