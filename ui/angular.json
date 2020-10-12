@@ -124,6 +124,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "avgsp"
+    }
+  },
+  "defaultProject": "avgsp",
+  "cli": {
+    "analytics": false
+  }
 }
