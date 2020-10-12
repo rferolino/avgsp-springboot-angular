@@ -215,25 +215,60 @@ we will have a Whitelabel Error Page.
 
 This happens because Angular by default all paths are supported and accessible
 but with the usage of Maven, Spring Boot tries to manage paths by itself. 
-To fix this, we need to add some configurations. Create a package **config/**
-and create **WebConfig.java**. This class has to implement **WebMvcConfigurer** and 
-to use **ResourceHandlers**.
+To fix this, we need to add some configurations. 
 
 ``` 
-@Override
-public void addResourceHandlers(ResourceHandlerRegistry registry) {
-  
-   registry.addResourceHandler("/**")
-           .addResourceLocations("classpath:/static/")
-           .resourceChain(true)
-           .addResolver(new PathResourceResolver() {
-               @Override
-               protected Resource getResource(String resourcePath, Resource location) throws IOException {
-                   Resource requestedResource = location.createRelative(resourcePath);
-                   return requestedResource.exists() && requestedResource.isReadable() ? requestedResource
-                           : new ClassPathResource("/static/index.html");
-               }
-           });
+public class AvgStationPortal {
+
+    @Value("${rest.api.base.path}")
+    private String restApiBasePath;
+    @Value("${cors.allowed.origins}")
+    private String[] corsAllowedOrigins;
+
+    public static void main(String[] args) {
+        SpringApplication.run(AvgStationPortal.class, args);
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins(corsAllowedOrigins);
+            }
+        };
+    }
+
+    @Bean
+    public WebMvcRegistrations webMvcRegistrationsHandlerMapping() {
+        AvgStationPortal application = this;
+        return new WebMvcRegistrations() {
+            @Override
+            public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+                return new RequestMappingHandlerMapping() {
+
+                    @Override
+                    protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
+                        Class<?> beanType = method.getDeclaringClass();
+                        RestController restApiController = beanType.getAnnotation(RestController.class);
+                        if (restApiController != null) {
+                            PatternsRequestCondition apiPattern = new PatternsRequestCondition(application.restApiBasePath)
+                                    .combine(mapping.getPatternsCondition());
+
+                            mapping = new RequestMappingInfo(mapping.getName(), apiPattern,
+                                    mapping.getMethodsCondition(), mapping.getParamsCondition(),
+                                    mapping.getHeadersCondition(), mapping.getConsumesCondition(),
+                                    mapping.getProducesCondition(), mapping.getCustomCondition());
+                        }
+
+                        super.registerHandlerMethod(handler, method, mapping);
+                    }
+                };
+            }
+        };
+    }
 }
 ```
 
