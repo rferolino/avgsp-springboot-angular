@@ -2,7 +2,7 @@
 
 ## Architecture Overview / Prerequisites
 
-Java 8 - Download and install the JDK 8.  
+Java 11 - Download and install the OpenJDK 11.  
 Node.js - Download and install  
 Angular CLI - used to bootstrap the Angular application. You can install it using npm as a default package manager for the JavaScript runtime environment Node.js
 
