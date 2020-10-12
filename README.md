@@ -2,7 +2,7 @@
 
 ## Architecture Overview / Prerequisites
 
-Java 8 - Download and install the JDK 8.  
+Java 11 - Download and install the Open-JDK 11+.  
 Node.js - Download and install  
 Angular CLI - used to bootstrap the Angular application. You can install it using npm as a default package manager for the JavaScript runtime environment Node.js
 
@@ -58,138 +58,6 @@ In the snippet below we have added also some plugins such as:
 * spring-boot-maven-plugin - This plugin provides several usages allowing us to package executable JAR or WAR archives and run the application.
 
 ```
-<build>
-   <plugins>
-       <plugin>
-           <artifactId>maven-resources-plugin</artifactId>
-           <executions>
-               <execution>
-                   <id>copy-resources</id>
-                   <phase>validate</phase>
-                   <goals><goal>copy-resources</goal></goals>
-                   <configuration>
-                       <outputDirectory>${project.build.directory}/classes/resources/</outputDirectory>
-                       <resources>
-                           <resource>
-                               <directory>${project.parent.basedir}/frontend/dist/avgsp/</directory>
-                           </resource>
-                       </resources>
-                   </configuration>
-               </execution>
-           </executions>
-       </plugin>
-       <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-failsafe-plugin</artifactId>
-       </plugin>
-       <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-surefire-plugin</artifactId>
-       </plugin>
-       <plugin>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-maven-plugin</artifactId>
-       </plugin>
-   </plugins>
-</build>
-```
-
-After implementing the plugins section, we need to include the **frontend** 
-dependency. This will make sure the **frontend** is included in the final
-executable JAR.
-
-```
-<dependencies>
-   <dependency>
-       <groupId>com</groupId>
-       <artifactId>frontend</artifactId>
-       <version>${project.version}</version>
-       <scope>runtime</scope>
-   </dependency>
- <!-- Other Dependencies -->
-</dependencies>
-```
-
-## Implement front-end side
-
-Next, we need to implement the pom.xml in **frontend** by adding the parent section:
-
-```
-<parent>
-   <groupId>com</groupId>
-   <artifactId>avgsp</artifactId>
-   <version>0.0.1-SNAPSHOT</version>
-</parent>
-
-<artifactId>frontend</artifactId>
-<version>0.0.1-SNAPSHOT</version>
-```
-
-To execute some of npm commands we need the **frontend-maven-plugin**.
-This plugin comes with a set of built-in commands which we can use for
-triggering npm commands
-
-``` 
-<build>
-<plugins>
-   <plugin>
-       <groupId>com.github.eirslett</groupId>
-       <artifactId>frontend-maven-plugin</artifactId>
-       <version>1.7.6</version>
-       <configuration>
-           <workingDirectory>./</workingDirectory>
-           <nodeVersion>v10.16.0</nodeVersion>
-           <npmVersion>6.10.2</npmVersion>
-       </configuration>
-       <executions>
-           <execution>
-               <id>install node and npm</id>
-               <goals>
-                   <goal>install-node-and-npm</goal>
-               </goals>
-           </execution>
-           <execution>
-               <id>npm install</id>
-               <goals>
-                   <goal>npm</goal>
-               </goals>
-           </execution>
-           <execution>
-               <id>npm run build</id>
-               <goals>
-                   <goal>npm</goal>
-               </goals>
-               <configuration>
-                   <arguments>run build</arguments>
-               </configuration>
-           </execution>
-       </executions>
-   </plugin>
-</plugins>
-</build>
-```
-
-In the configuration tag, we implement the working directory and we select 
-the Node and Npm versions.
-
-Also, in the build section we need to define the resources by specifying the 
-directory. The **dist/avgsp** folder is used to be placed inside the build output.
-
-```
-<resources>
-   <resource>
-       <directory>./dist/avgsp</directory>
-       <targetPath>static</targetPath>
-   </resource>
-</resources>
-```
-
-## Testing back-end and front-end
-
-After completing the configurations steps, we make sure our instances are working correctly before the build. First we can run the backend project by using:
-**mvn spring-boot:run**
-
-*Also make sure you execute the command inside the backend module. 
 
 Next. we can start our Angular project using:
 **ng serve**
@@ -215,25 +83,60 @@ we will have a Whitelabel Error Page.
 
 This happens because Angular by default all paths are supported and accessible
 but with the usage of Maven, Spring Boot tries to manage paths by itself. 
-To fix this, we need to add some configurations. Create a package **config/**
-and create **WebConfig.java**. This class has to implement **WebMvcConfigurer** and 
-to use **ResourceHandlers**.
+To fix this, we need to add some configurations. 
 
 ``` 
-@Override
-public void addResourceHandlers(ResourceHandlerRegistry registry) {
-  
-   registry.addResourceHandler("/**")
-           .addResourceLocations("classpath:/static/")
-           .resourceChain(true)
-           .addResolver(new PathResourceResolver() {
-               @Override
-               protected Resource getResource(String resourcePath, Resource location) throws IOException {
-                   Resource requestedResource = location.createRelative(resourcePath);
-                   return requestedResource.exists() && requestedResource.isReadable() ? requestedResource
-                           : new ClassPathResource("/static/index.html");
-               }
-           });
+public class AvgStationPortal {
+
+    @Value("${rest.api.base.path}")
+    private String restApiBasePath;
+    @Value("${cors.allowed.origins}")
+    private String[] corsAllowedOrigins;
+
+    public static void main(String[] args) {
+        SpringApplication.run(AvgStationPortal.class, args);
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins(corsAllowedOrigins);
+            }
+        };
+    }
+
+    @Bean
+    public WebMvcRegistrations webMvcRegistrationsHandlerMapping() {
+        AvgStationPortal application = this;
+        return new WebMvcRegistrations() {
+            @Override
+            public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+                return new RequestMappingHandlerMapping() {
+
+                    @Override
+                    protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
+                        Class<?> beanType = method.getDeclaringClass();
+                        RestController restApiController = beanType.getAnnotation(RestController.class);
+                        if (restApiController != null) {
+                            PatternsRequestCondition apiPattern = new PatternsRequestCondition(application.restApiBasePath)
+                                    .combine(mapping.getPatternsCondition());
+
+                            mapping = new RequestMappingInfo(mapping.getName(), apiPattern,
+                                    mapping.getMethodsCondition(), mapping.getParamsCondition(),
+                                    mapping.getHeadersCondition(), mapping.getConsumesCondition(),
+                                    mapping.getProducesCondition(), mapping.getCustomCondition());
+                        }
+
+                        super.registerHandlerMethod(handler, method, mapping);
+                    }
+                };
+            }
+        };
+    }
 }
 ```
 
