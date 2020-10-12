@@ -36,7 +36,7 @@ Also here we have to specify, the packaging to serve as a container for our sub-
 
 ## Implementing the back-end side
 
-In the **backend** module we implement the parent section
+In the **services** module we implement the parent section
 
 ```
 <parent>
@@ -45,144 +45,17 @@ In the **backend** module we implement the parent section
    <version>0.0.1-SNAPSHOT</version>
 </parent>
 
-<artifactId>backend</artifactId>
+<artifactId>services</artifactId>
 <version>0.0.1-SNAPSHOT</version>
 ```
 Next, we implement the Maven Resources Plugin. This plugin is used to execute our
-generated **frontend** module. In the output directory section we select the 
-project build directory and the resources from our **dist/avgsp** generated folder. 
+generated **ui** module. 
 In the snippet below we have added also some plugins such as:
 
 * maven-failsafe-plugin - is used and designed for integration tests
 * maven-surefire-plugin - is used to run unit tests
 * spring-boot-maven-plugin - This plugin provides several usages allowing us to package executable JAR or WAR archives and run the application.
 
-```
-<build>
-   <plugins>
-       <plugin>
-           <artifactId>maven-resources-plugin</artifactId>
-           <executions>
-               <execution>
-                   <id>copy-resources</id>
-                   <phase>validate</phase>
-                   <goals><goal>copy-resources</goal></goals>
-                   <configuration>
-                       <outputDirectory>${project.build.directory}/classes/resources/</outputDirectory>
-                       <resources>
-                           <resource>
-                               <directory>${project.parent.basedir}/frontend/dist/avgsp/</directory>
-                           </resource>
-                       </resources>
-                   </configuration>
-               </execution>
-           </executions>
-       </plugin>
-       <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-failsafe-plugin</artifactId>
-       </plugin>
-       <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-surefire-plugin</artifactId>
-       </plugin>
-       <plugin>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-maven-plugin</artifactId>
-       </plugin>
-   </plugins>
-</build>
-```
-
-After implementing the plugins section, we need to include the **frontend** 
-dependency. This will make sure the **frontend** is included in the final
-executable JAR.
-
-```
-<dependencies>
-   <dependency>
-       <groupId>com</groupId>
-       <artifactId>frontend</artifactId>
-       <version>${project.version}</version>
-       <scope>runtime</scope>
-   </dependency>
- <!-- Other Dependencies -->
-</dependencies>
-```
-
-## Implement front-end side
-
-Next, we need to implement the pom.xml in **frontend** by adding the parent section:
-
-```
-<parent>
-   <groupId>com</groupId>
-   <artifactId>avgsp</artifactId>
-   <version>0.0.1-SNAPSHOT</version>
-</parent>
-
-<artifactId>frontend</artifactId>
-<version>0.0.1-SNAPSHOT</version>
-```
-
-To execute some of npm commands we need the **frontend-maven-plugin**.
-This plugin comes with a set of built-in commands which we can use for
-triggering npm commands
-
-``` 
-<build>
-<plugins>
-   <plugin>
-       <groupId>com.github.eirslett</groupId>
-       <artifactId>frontend-maven-plugin</artifactId>
-       <version>1.7.6</version>
-       <configuration>
-           <workingDirectory>./</workingDirectory>
-           <nodeVersion>v10.16.0</nodeVersion>
-           <npmVersion>6.10.2</npmVersion>
-       </configuration>
-       <executions>
-           <execution>
-               <id>install node and npm</id>
-               <goals>
-                   <goal>install-node-and-npm</goal>
-               </goals>
-           </execution>
-           <execution>
-               <id>npm install</id>
-               <goals>
-                   <goal>npm</goal>
-               </goals>
-           </execution>
-           <execution>
-               <id>npm run build</id>
-               <goals>
-                   <goal>npm</goal>
-               </goals>
-               <configuration>
-                   <arguments>run build</arguments>
-               </configuration>
-           </execution>
-       </executions>
-   </plugin>
-</plugins>
-</build>
-```
-
-In the configuration tag, we implement the working directory and we select 
-the Node and Npm versions.
-
-Also, in the build section we need to define the resources by specifying the 
-directory. The **dist/avgsp** folder is used to be placed inside the build output.
-
-```
-<resources>
-   <resource>
-       <directory>./dist/avgsp</directory>
-       <targetPath>static</targetPath>
-   </resource>
-</resources>
-```
 
 ## Testing back-end and front-end
 
@@ -272,11 +145,6 @@ public class AvgStationPortal {
 }
 ```
 
-The /** pattern is matched by **AntPathMatcher** to directories in the path,
-so the configuration will be applied to our project routes. 
-Also the **PathResourceResolver** will try to find any resource under the
-location given, so all the requests that are not handled by Spring Boot 
-will be redirected to *static/index.html* giving access to Angular to manage them.
 
 Next, we just build our project and generate the JAR file.
 
