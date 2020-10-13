@@ -47,7 +47,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony default export */
 
 
-    __webpack_exports__["default"] = "<h1>Spring Boot Angular Pagination Example App</h1>\n<nav>\n  <ul>\n    <li><a routerLink=\"/todos1\" routerLinkActive=\"active\">DataTable Pagination Example</a></li>\n    <li><a routerLink=\"/todos2\" routerLinkActive=\"active\">Normal Table Example</a></li>\n  </ul>\n</nav>\n<router-outlet></router-outlet>\n";
+    __webpack_exports__["default"] = "<h1>Spring Boot Angular Pagination Example App</h1>\n<h2>Use localhost:8080/api/ to access the api services</h2>\n<router-outlet></router-outlet>\n";
     /***/
   },
 

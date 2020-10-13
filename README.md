@@ -13,12 +13,12 @@ In the example that I’m detailing below, we used Spring Boot 2.2.1  RELEASE ve
 
 The first step of the implementation is to create a multi-module Spring Boot 
 application. Initially we create a parent module **spring-boot-angular-maven-build**
-which will contain the **backend** module and the **frontend** module.
+which will contain the **services** module and the **ui** module.
 
-Assuming that you created the **backend** and **frontend** projects in the 
+Assuming that you created the **services** and **ui** projects in the 
 specified modules.
- * **services** - will contain the backend project
- * **ui** - will contain the frontend project
+ * **services** - will contain the services project
+ * **ui** - will contain the ui project
 
 Then, we need to create the modules using Maven Build Tool. We add the modules in the main **pom.xml**
 
@@ -36,7 +36,7 @@ Also here we have to specify, the packaging to serve as a container for our sub-
 
 ## Implementing the back-end side
 
-In the **backend** module we implement the parent section
+In the **services** module we implement the parent section
 
 ```
 <parent>
@@ -45,11 +45,11 @@ In the **backend** module we implement the parent section
    <version>0.0.1-SNAPSHOT</version>
 </parent>
 
-<artifactId>backend</artifactId>
+<artifactId>services</artifactId>
 <version>0.0.1-SNAPSHOT</version>
 ```
 Next, we implement the Maven Resources Plugin. This plugin is used to execute our
-generated **frontend** module. In the output directory section we select the 
+generated **ui** module. In the output directory section we select the 
 project build directory and the resources from our **dist/avgsp** generated folder. 
 In the snippet below we have added also some plugins such as:
 
@@ -60,21 +60,23 @@ In the snippet below we have added also some plugins such as:
 ```
 
 Next. we can start our Angular project using:
+
 **ng serve**
 
 ## Build project
 
 If everything seems to work correctly we can build the project using:
-**mvn clean install**
+
+**mvn package spring-boot:repackage**
 
 *Make sure you are executing the command in the spring-boot-angular-maven-build parent module*
 
-After building the application, in the backend is generated the target/
-folder which contains the jar: backend-0.0.1-SNAPSHOT.jar 
-And in the **frontend** is generated the dist/ folder and node_modules.
+After building the application, in the services is generated the target/
+folder which contains the jar: services-0.0.1-SNAPSHOT.jar 
+And in the **ui** is generated the dist/ folder and node_modules.
 If you want to run the executable JAR, open terminal and add:
 
-java -jar backend-0.0.1-SNAPSHOT.jar
+java -jar services-0.0.1-SNAPSHOT.jar
 
 ## Allow Angular to handle routes
 
