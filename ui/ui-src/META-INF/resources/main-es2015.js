@@ -32,7 +32,7 @@ webpackEmptyAsyncContext.id = "./$$_lazy_route_resource lazy recursive";
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<h1>Spring Boot Angular Pagination Example App</h1>\n<h2>Use localhost:8080/api/ to access the api services</h2>\n<router-outlet></router-outlet>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<h1>Spring Boot Angular Template App</h1>\n<h2>Use localhost:8080/api/ to access the api services</h2>\n<router-outlet></router-outlet>\n");
 
 /***/ }),
 
@@ -212,7 +212,7 @@ Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformB
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/rollyferolino/Projects/learnSpring/avgsp/ui/src/main.ts */"./src/main.ts");
+module.exports = __webpack_require__(/*! /Users/rollyferolino/Documents/GitHub/avgsp-springboot-angular/ui/src/main.ts */"./src/main.ts");
 
 
 /***/ })
